@@ -4,7 +4,6 @@ import 'dart:convert';
 class ApiService {
   static const String baseUrl = "http://localhost:3000";
 
-  // 📚 BOOKS API
   Future<List<dynamic>> fetchBooks() async {
     final response = await http.get(Uri.parse("$baseUrl/livres"));
     if (response.statusCode == 200) {
