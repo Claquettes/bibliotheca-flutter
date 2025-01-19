@@ -39,7 +39,14 @@ class _EditionLivrePageState extends State<EditionLivrePage> {
       if (widget.book == null) {
         apiService.createBook(bookData).then((_) => Navigator.pop(context, true));
       } else {
-        apiService.updateBook(widget.book!["id"], bookData).then((_) => Navigator.pop(context, true));
+        print("Updating book with ID ${widget.book!["id"]}");
+        print("Updated data: $bookData");
+        apiService.updateBook(widget.book!["id"], bookData).then((_) {
+          print("Update successful!");
+          Navigator.pop(context, true);
+        }).catchError((e) {
+          print("Update failed: $e");
+        });
       }
     }
   }
