@@ -11,6 +11,7 @@ class _ListeLivrePageState extends State<ListeLivrePage> {
   final ApiService apiService = ApiService();
   late Future<List<dynamic>> books;
   String errorMessage = "";
+  final String fallbackImage = "https://www.kittyinny.com/uploads/8/8/2/5/8825228/8079341_orig.jpg";
 
   @override
   void initState() {
@@ -84,8 +85,20 @@ class _ListeLivrePageState extends State<ListeLivrePage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 var book = snapshot.data![index];
+                String imageUrl = (book["image"] != null && book["image"].toString().isNotEmpty)
+                    ? book["image"]
+                    : fallbackImage; // Use fallback image if the URL is invalid
+
                 return ListTile(
-                  leading: Image.network(book["image"] ?? "", width: 50, height: 50, fit: BoxFit.cover),
+                  leading: Image.network(
+                    imageUrl,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.network(fallbackImage, width: 50, height: 50, fit: BoxFit.cover);
+                    },
+                  ),
                   title: Text(book["libelle"]),
                   subtitle: Text(book["description"] ?? "Pas de description"),
                   trailing: IconButton(
