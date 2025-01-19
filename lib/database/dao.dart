@@ -1,5 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../models/auteur.dart'; // Ensure correct import path
+
 
 class ApiService {
   static const String baseUrl = "http://localhost:3000";
@@ -80,13 +82,14 @@ class ApiService {
   }
 
   // 👤 FETCH AUTHORS
-  Future<List<dynamic>> fetchAuthors() async {
+  Future<List<Auteur>> fetchAuthors() async {
     try {
       print("Fetching authors...");
       final response = await http.get(Uri.parse("$baseUrl/auteurs"));
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        List<dynamic> data = jsonDecode(response.body);
+        return data.map((json) => Auteur.fromJson(json)).toList(); // Convert API data to `Auteur` list
       } else {
         throw Exception("Failed to load authors: ${response.statusCode}");
       }
@@ -95,6 +98,7 @@ class ApiService {
       throw Exception("Error loading authors: $e");
     }
   }
+
 
   // 👤 CREATE AUTHOR
   Future<void> createAuthor(Map<String, dynamic> authorData) async {
