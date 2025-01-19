@@ -15,12 +15,16 @@ class _EditionLivrePageState extends State<EditionLivrePage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
+  late TextEditingController _nbPagesController;
+  late TextEditingController _imageController;
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.book?["libelle"] ?? "");
     _descriptionController = TextEditingController(text: widget.book?["description"] ?? "");
+    _nbPagesController = TextEditingController(text: widget.book?["nbPage"]?.toString() ?? "");
+    _imageController = TextEditingController(text: widget.book?["image"] ?? "");
   }
 
   void _saveBook() {
@@ -28,13 +32,25 @@ class _EditionLivrePageState extends State<EditionLivrePage> {
       Map<String, dynamic> bookData = {
         "libelle": _titleController.text,
         "description": _descriptionController.text,
+        "nbPage": int.tryParse(_nbPagesController.text) ?? 0,
+        "image": _imageController.text,
       };
+
       if (widget.book == null) {
-        apiService.createBook(bookData).then((_) => Navigator.pop(context));
+        apiService.createBook(bookData).then((_) => Navigator.pop(context, true));
       } else {
-        apiService.updateBook(widget.book!["id"], bookData).then((_) => Navigator.pop(context));
+        apiService.updateBook(widget.book!["id"], bookData).then((_) => Navigator.pop(context, true));
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _nbPagesController.dispose();
+    _imageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -55,6 +71,16 @@ class _EditionLivrePageState extends State<EditionLivrePage> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(labelText: "Description"),
+              ),
+              TextFormField(
+                controller: _nbPagesController,
+                decoration: InputDecoration(labelText: "Nombre de pages"),
+                keyboardType: TextInputType.number,
+                validator: (value) => value!.isEmpty ? "Le nombre de pages est requis" : null,
+              ),
+              TextFormField(
+                controller: _imageController,
+                decoration: InputDecoration(labelText: "URL de l'image"),
               ),
               SizedBox(height: 20),
               ElevatedButton(

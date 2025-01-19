@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../database/dao.dart';
+import 'edition_livre.dart'; // Ensure this is imported
 
 class ListeLivrePage extends StatefulWidget {
   @override
@@ -29,6 +30,21 @@ class _ListeLivrePageState extends State<ListeLivrePage> {
         errorMessage = e.toString();
       });
       return Future.error(e);
+    }
+  }
+
+  void _navigateToEditPage(Map<String, dynamic> book) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditionLivrePage(book: book),
+      ),
+    );
+
+    if (result == true) {
+      setState(() {
+        books = fetchBooksWithDebug(); // Refresh list after editing
+      });
     }
   }
 
@@ -69,7 +85,7 @@ class _ListeLivrePageState extends State<ListeLivrePage> {
               itemBuilder: (context, index) {
                 var book = snapshot.data![index];
                 return ListTile(
-                  leading: Icon(Icons.book),
+                  leading: Image.network(book["image"] ?? "", width: 50, height: 50, fit: BoxFit.cover),
                   title: Text(book["libelle"]),
                   subtitle: Text(book["description"] ?? "Pas de description"),
                   trailing: IconButton(
@@ -84,9 +100,7 @@ class _ListeLivrePageState extends State<ListeLivrePage> {
                       });
                     },
                   ),
-                  onTap: () {
-                    Navigator.pushNamed(context, "/editBook", arguments: book);
-                  },
+                  onTap: () => _navigateToEditPage(book), // Navigate to edit page
                 );
               },
             );
@@ -96,7 +110,16 @@ class _ListeLivrePageState extends State<ListeLivrePage> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
-          Navigator.pushNamed(context, "/addBook");
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EditionLivrePage()),
+          ).then((result) {
+            if (result == true) {
+              setState(() {
+                books = fetchBooksWithDebug();
+              });
+            }
+          });
         },
       ),
     );
