@@ -9,7 +9,6 @@ class SyncService {
   final DatabaseHelper dbHelper = DatabaseHelper();
   static const String apiBaseUrl = "http://localhost:3000";
 
-  // 🔄 Synchronisation : Récupérer les catégories depuis l'API et les stocker localement
   Future<void> syncCategoriesWithAPI() async {
     final db = await dbHelper.database;
 
@@ -30,7 +29,6 @@ class SyncService {
         String? remoteTimestamp = categorie['last_updated'] as String?;
 
         if (existingCategory.isEmpty) {
-          // 📌 Insérer si la catégorie n'existe pas
           await db.insert('categorie', {
             'id': categorie['id'],
             'libelle': categorie['libelle'],
@@ -38,7 +36,6 @@ class SyncService {
             'is_synced': 1,
           }, conflictAlgorithm: ConflictAlgorithm.replace);
         } else {
-          // 📌 Vérifier le timestamp pour éviter les conflits
           if (remoteTimestamp != null && (localTimestamp == null || DateTime.parse(remoteTimestamp).isAfter(DateTime.parse(localTimestamp)))) {
             await db.update(
               'categorie',
@@ -58,7 +55,6 @@ class SyncService {
     }
   }
 
-  // 🔄 Synchronisation : Envoyer les catégories locales vers l'API
   Future<void> pushCategoriesToAPI() async {
     final db = await dbHelper.database;
     List<Map<String, dynamic>> categories = await db.query('categorie', where: 'is_synced = ?', whereArgs: [0]);

@@ -6,7 +6,6 @@ import '../models/auteur.dart'; // Ensure correct import path
 class ApiService {
   static const String baseUrl = "http://localhost:3000";
 
-  // 📚 FETCH BOOKS
   Future<List<dynamic>> fetchBooks() async {
     try {
       print("Fetching books from API...");
@@ -25,7 +24,6 @@ class ApiService {
     }
   }
 
-  // 📚 CREATE BOOK
   Future<void> createBook(Map<String, dynamic> bookData) async {
     try {
       print("Creating book: $bookData");
@@ -45,7 +43,6 @@ class ApiService {
     }
   }
 
-  // 📚 UPDATE BOOK
   Future<void> updateBook(int id, Map<String, dynamic> bookData) async {
     try {
       print("Updating book ID $id with data: $bookData");
@@ -65,7 +62,6 @@ class ApiService {
     }
   }
 
-  // 📚 DELETE BOOK
   Future<void> deleteBook(int id) async {
     try {
       print("Deleting book ID: $id");
@@ -81,7 +77,6 @@ class ApiService {
     }
   }
 
-  // 👤 FETCH AUTHORS
   Future<List<Auteur>> fetchAuthors() async {
     try {
       print("Fetching authors...");
@@ -100,7 +95,6 @@ class ApiService {
   }
 
 
-  // 👤 CREATE AUTHOR
   Future<void> createAuthor(Map<String, dynamic> authorData) async {
     try {
       print("Creating author: $authorData");
@@ -119,7 +113,6 @@ class ApiService {
     }
   }
 
-  // 👤 UPDATE AUTHOR
   Future<void> updateAuthor(int id, Map<String, dynamic> authorData) async {
     try {
       print("Updating author ID $id with data: $authorData");
@@ -138,7 +131,6 @@ class ApiService {
     }
   }
 
-  // 👤 DELETE AUTHOR
   Future<void> deleteAuthor(int id) async {
     try {
       print("Deleting author ID: $id");
@@ -153,7 +145,6 @@ class ApiService {
     }
   }
 
-  // 🏷️ FETCH CATEGORIES
   Future<List<dynamic>> fetchCategories() async {
     try {
       print("Fetching categories...");
@@ -170,7 +161,6 @@ class ApiService {
     }
   }
 
-  // 🏷️ CREATE CATEGORY
   Future<void> createCategory(Map<String, dynamic> categoryData) async {
     try {
       print("Creating category: $categoryData");
@@ -189,7 +179,6 @@ class ApiService {
     }
   }
 
-  // 🏷️ UPDATE CATEGORY
   Future<void> updateCategory(int id, Map<String, dynamic> categoryData) async {
     try {
       print("Updating category ID $id with data: $categoryData");
@@ -208,7 +197,6 @@ class ApiService {
     }
   }
 
-  // 🏷️ DELETE CATEGORY
   Future<void> deleteCategory(int id) async {
     try {
       print("Deleting category ID: $id");

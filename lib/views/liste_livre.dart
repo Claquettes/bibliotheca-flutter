@@ -44,7 +44,7 @@ class _ListeLivrePageState extends State<ListeLivrePage> {
 
     if (result == true) {
       setState(() {
-        books = fetchBooksWithDebug(); // Refresh list after editing
+        books = fetchBooksWithDebug();
       });
     }
   }
@@ -113,7 +113,7 @@ class _ListeLivrePageState extends State<ListeLivrePage> {
                       });
                     },
                   ),
-                  onTap: () => _navigateToEditPage(book), // Navigate to edit page
+                  onTap: () => _navigateToEditPage(book),
                 );
               },
             );

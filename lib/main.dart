@@ -4,7 +4,7 @@ import 'services/sync_manager.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SyncManager.startAutoSync(); // Démarrer la synchronisation automatique
+  SyncManager.startAutoSync(); // l'auto synchro wow
 
   runApp(MaterialApp(
     title: "Bibliotheca",

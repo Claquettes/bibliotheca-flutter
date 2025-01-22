@@ -10,8 +10,8 @@ class Auteur {
   factory Auteur.fromJson(Map<String, dynamic> json) {
     return Auteur(
       id: json['id'],
-      nom: json['nom'] ?? "Nom inconnu", // Provide default value if null
-      prenoms: json['prenoms'] ?? "Prénom inconnu", // Keep 'prenoms' field
+      nom: json['nom'] ?? "Nom inconnu",
+      prenoms: json['prenoms'] ?? "Prénom inconnu",
       email: json['email'] ?? "Email non fourni",
     );
   }
