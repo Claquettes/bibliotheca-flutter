@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../database/dao.dart';
-import 'edition_livre.dart'; // Ensure this is imported
+import 'edition_livre.dart';
 
 class ListeLivrePage extends StatefulWidget {
   @override
@@ -10,41 +10,28 @@ class ListeLivrePage extends StatefulWidget {
 class _ListeLivrePageState extends State<ListeLivrePage> {
   final ApiService apiService = ApiService();
   late Future<List<dynamic>> books;
-  String errorMessage = "";
-  final String fallbackImage = "https://www.kittyinny.com/uploads/8/8/2/5/8825228/8079341_orig.jpg";
+
+  final Color backgroundColor = Color(0xFF24273A);
+  final Color cardColor = Color(0xFF363A4F);
+  final Color textColor = Color(0xFFCAD3F5);
+  final Color primaryColor = Color(0xFF8AADF4);
+  final String fallbackImage = "https://via.placeholder.com/100";
 
   @override
   void initState() {
     super.initState();
-    books = fetchBooksWithDebug();
-  }
-
-  Future<List<dynamic>> fetchBooksWithDebug() async {
-    try {
-      print("Fetching books from API...");
-      List<dynamic> data = await apiService.fetchBooks();
-      print("API Response: $data");
-      return data;
-    } catch (e) {
-      print("Error fetching books: $e");
-      setState(() {
-        errorMessage = e.toString();
-      });
-      return Future.error(e);
-    }
+    books = apiService.fetchBooks();
   }
 
   void _navigateToEditPage(Map<String, dynamic> book) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => EditionLivrePage(book: book),
-      ),
+      MaterialPageRoute(builder: (context) => EditionLivrePage(book: book)),
     );
 
     if (result == true) {
       setState(() {
-        books = fetchBooksWithDebug();
+        books = apiService.fetchBooks();
       });
     }
   }
@@ -52,87 +39,27 @@ class _ListeLivrePageState extends State<ListeLivrePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Liste des livres")),
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        title: Text("Liste des livres"),
+        backgroundColor: primaryColor,
+      ),
       body: FutureBuilder<List<dynamic>>(
         future: books,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Erreur de chargement", style: TextStyle(color: Colors.red)),
-                  SizedBox(height: 10),
-                  Text(errorMessage, textAlign: TextAlign.center),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        books = fetchBooksWithDebug();
-                      });
-                    },
-                    child: Text("Réessayer"),
-                  ),
-                ],
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("Aucun livre trouvé."));
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                var book = snapshot.data![index];
-                String imageUrl = (book["image"] != null && book["image"].toString().isNotEmpty)
-                    ? book["image"]
-                    : fallbackImage; // Use fallback image if the URL is invalid
-
-                return ListTile(
-                  leading: Image.network(
-                    imageUrl,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.network(fallbackImage, width: 50, height: 50, fit: BoxFit.cover);
-                    },
-                  ),
-                  title: Text(book["libelle"]),
-                  subtitle: Text(book["description"] ?? "Pas de description"),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      apiService.deleteBook(book["id"]).then((_) {
-                        setState(() {
-                          books = fetchBooksWithDebug();
-                        });
-                      }).catchError((e) {
-                        print("Error deleting book: $e");
-                      });
-                    },
-                  ),
+          return ListView(
+            children: snapshot.data?.map((book) {
+              return Card(
+                color: cardColor,
+                margin: EdgeInsets.all(10),
+                child: ListTile(
+                  leading: Image.network(book["image"] ?? fallbackImage, width: 50, height: 50),
+                  title: Text(book["libelle"], style: TextStyle(color: textColor)),
                   onTap: () => _navigateToEditPage(book),
-                );
-              },
-            );
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => EditionLivrePage()),
-          ).then((result) {
-            if (result == true) {
-              setState(() {
-                books = fetchBooksWithDebug();
-              });
-            }
-          });
+                ),
+              );
+            }).toList() ?? [],
+          );
         },
       ),
     );

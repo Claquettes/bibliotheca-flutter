@@ -10,27 +10,16 @@ class ListeCategoriePage extends StatefulWidget {
 class _ListeCategoriePageState extends State<ListeCategoriePage> {
   final ApiService apiService = ApiService();
   late Future<List<dynamic>> categories;
-  String errorMessage = "";
+
+  final Color backgroundColor = Color(0xFF24273A);
+  final Color cardColor = Color(0xFF363A4F);
+  final Color textColor = Color(0xFFCAD3F5);
+  final Color primaryColor = Color(0xFF8AADF4);
 
   @override
   void initState() {
     super.initState();
-    categories = fetchCategoriesWithDebug();
-  }
-
-  Future<List<dynamic>> fetchCategoriesWithDebug() async {
-    try {
-      print("Fetching categories from API...");
-      List<dynamic> data = await apiService.fetchCategories();
-      print("API Response: $data");
-      return data;
-    } catch (e) {
-      print("Error fetching categories: $e");
-      setState(() {
-        errorMessage = e.toString();
-      });
-      return Future.error(e);
-    }
+    categories = apiService.fetchCategories();
   }
 
   void _navigateToEditPage(Map<String, dynamic>? category) async {
@@ -43,7 +32,7 @@ class _ListeCategoriePageState extends State<ListeCategoriePage> {
 
     if (result == true) {
       setState(() {
-        categories = fetchCategoriesWithDebug(); // Refresh list after editing
+        categories = apiService.fetchCategories(); // Refresh list after editing
       });
     }
   }
@@ -51,54 +40,45 @@ class _ListeCategoriePageState extends State<ListeCategoriePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Liste des catégories")),
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        title: Text("Liste des catégories"),
+        backgroundColor: primaryColor,
+      ),
       body: FutureBuilder<List<dynamic>>(
         future: categories,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Erreur de chargement", style: TextStyle(color: Colors.red)),
-                  SizedBox(height: 10),
-                  Text(errorMessage, textAlign: TextAlign.center),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        categories = fetchCategoriesWithDebug();
-                      });
-                    },
-                    child: Text("Réessayer"),
-                  ),
-                ],
-              ),
-            );
+            return Center(child: Text("Erreur de chargement: ${snapshot.error}", style: TextStyle(color: textColor)));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("Aucune catégorie trouvée."));
+            return Center(child: Text("Aucune catégorie trouvée.", style: TextStyle(color: textColor)));
           } else {
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 var category = snapshot.data![index];
-                return ListTile(
-                  title: Text(category["libelle"]),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      apiService.deleteCategory(category["id"]).then((_) {
-                        setState(() {
-                          categories = fetchCategoriesWithDebug();
+                return Card(
+                  color: cardColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: ListTile(
+                    title: Text(category["libelle"], style: TextStyle(color: textColor)),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        apiService.deleteCategory(category["id"]).then((_) {
+                          setState(() {
+                            categories = apiService.fetchCategories();
+                          });
+                        }).catchError((e) {
+                          print("Error deleting category: $e");
                         });
-                      }).catchError((e) {
-                        print("Error deleting category: $e");
-                      });
-                    },
+                      },
+                    ),
+                    onTap: () => _navigateToEditPage(category),
                   ),
-                  onTap: () => _navigateToEditPage(category), // Navigate to edit page
                 );
               },
             );
@@ -106,18 +86,10 @@ class _ListeCategoriePageState extends State<ListeCategoriePage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        backgroundColor: primaryColor,
+        child: Icon(Icons.add, color: backgroundColor),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => EditionCategoriePage()),
-          ).then((result) {
-            if (result == true) {
-              setState(() {
-                categories = fetchCategoriesWithDebug();
-              });
-            }
-          });
+          _navigateToEditPage(null);
         },
       ),
     );

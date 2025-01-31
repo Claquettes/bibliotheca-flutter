@@ -18,6 +18,11 @@ class _EditionAuteurPageState extends State<EditionAuteurPage> {
   late TextEditingController _prenomsController;
   late TextEditingController _emailController;
 
+  final Color backgroundColor = Color(0xFF24273A);
+  final Color cardColor = Color(0xFF363A4F);
+  final Color textColor = Color(0xFFCAD3F5);
+  final Color primaryColor = Color(0xFF8AADF4);
+
   @override
   void initState() {
     super.initState();
@@ -57,36 +62,55 @@ class _EditionAuteurPageState extends State<EditionAuteurPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.author == null ? "Ajouter un auteur" : "Modifier l'auteur")),
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        title: Text(widget.author == null ? "Ajouter un auteur" : "Modifier l'auteur"),
+        backgroundColor: primaryColor,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _nomController,
-                decoration: InputDecoration(labelText: "Nom"),
-                validator: (value) => value!.isEmpty ? "Le nom est requis" : null,
+        child: Card(
+          color: cardColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  _buildTextField(_nomController, "Nom"),
+                  _buildTextField(_prenomsController, "Prénoms"),
+                  _buildTextField(_emailController, "Email"),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+                    onPressed: _saveAuthor,
+                    child: Text("Enregistrer", style: TextStyle(color: textColor)),
+                  ),
+                ],
               ),
-              TextFormField(
-                controller: _prenomsController,
-                decoration: InputDecoration(labelText: "Prénoms"),
-                validator: (value) => value!.isEmpty ? "Le prénom est requis" : null,
-              ),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: "Email"),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _saveAuthor,
-                child: Text("Enregistrer"),
-              ),
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label) {
+    return TextFormField(
+      controller: controller,
+      style: TextStyle(color: textColor),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: textColor),
+        filled: true,
+        fillColor: Color(0xFF2E3350),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      validator: (value) => value!.isEmpty ? "$label est requis" : null,
     );
   }
 }
